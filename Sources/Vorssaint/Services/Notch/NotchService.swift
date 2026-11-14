@@ -4258,7 +4258,10 @@ final class NotchService: ObservableObject {
                 .sink { [weak self] _ in
                     self?.syncMenuSpaceMonitoring()
                     self?.objectWillChange.send()
-                    self?.refreshPresentation()
+                    // Between waiting and working the strip's mark and reading
+                    // both change, and so does its width: cross-fade them while
+                    // the silhouette moves, as one activity replacing another.
+                    self?.refreshPresentation(transitionContent: .replace)
                 }.store(in: &subscriptions)
         } else {
             AgentInputMonitor.shared.stop()
