@@ -167,6 +167,13 @@ enum NotchAgentSupport {
             ?? mostSpent { AgentLimitSupport.binding($0, now: now) }
     }
 
+    /// The sessions waiting on their person that the island shows: only
+    /// Claude's hook reports them, so none while Claude is left out.
+    static func waitingRequests(_ requests: [AgentInputRequest] = AgentInputMonitor.shared.requests,
+                                in defaults: UserDefaults = .standard) -> [AgentInputRequest] {
+        providers(in: defaults).contains(.claude) ? requests : []
+    }
+
     static func showsLiveActivity(in defaults: UserDefaults = .standard) -> Bool {
         isEnabled(in: defaults) && (defaults.object(forKey: DefaultsKey.notchAgentsLiveActivity) as? Bool ?? true)
     }
@@ -270,6 +277,17 @@ enum NotchAgentSupport {
                            text: NotchAgentStrings) -> String {
         display == .remaining ? text.left(AgentFormat.percent(window.remainingFraction))
             : text.usedShare(AgentFormat.percent(window.usedFraction))
+    }
+
+    /// What the strip's reading side shows: the waiting sessions while any
+    /// wait on their person, otherwise the chosen reading. The island
+    /// measures and draws this same text.
+    static func liveReading(_ snapshot: AgentUsageSnapshot, waiting: [AgentInputRequest],
+                            readout: NotchAgentReadout, display: NotchAgentLimitDisplay,
+                            focus: NotchAgentLimitFocus, now: Date,
+                            language: AppLanguage = L10n.shared.language) -> String {
+        guard waiting.isEmpty else { return FeatureStrings.agentInput(language).waiting(count: waiting.count) }
+        return stripReading(snapshot, readout: readout, display: display, focus: focus, now: now)
     }
 
     /// Every digit takes the same width, so a reading's shape, not its value,
