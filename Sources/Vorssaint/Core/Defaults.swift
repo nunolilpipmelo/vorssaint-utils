@@ -393,6 +393,7 @@ enum DefaultsKey {
     static let panelShowControls = "panelShowControls"
     static let panelShowToggles = "panelShowToggles"
     static let panelShowWallpaper = "panelShowWallpaper"
+    static let panelShowWorldClock = "panelShowWorldClock"
     // Quick toggles tab: per-action visibility (the order lives in panelToggleOrder).
     static let panelToggleDarkMode = "panelToggleDarkMode"
     static let panelToggleKeyboardLight = "panelToggleKeyboardLight"
@@ -424,6 +425,19 @@ enum DefaultsKey {
     static let menuBarConnectedDevices = "menuBarConnectedDevices"
     static let menuBarPower = "menuBarPower"
     static let menuBarFanSpeed = "menuBarFanSpeed"
+    static let menuBarWorldClock = "menuBarWorldClock"
+    // World clock: comma-joined zone identifiers ("local" is the Mac's own
+    // zone), the ones pinned to the menu bar, and whether they carry labels.
+    static let worldClockZones = "worldClockZones"
+    static let worldClockMenuBarZones = "worldClockMenuBarZones"
+    static let worldClockMenuBarLabels = "worldClockMenuBarLabels"
+    static let worldClockDragLeftForward = "worldClockDragLeftForward"
+    // Per zone: the user's own label (text and/or emoji) for the panel and menu bar.
+    static let worldClockShortLabels = "worldClockShortLabels"
+    // Working time tinted on the day bars, in minutes since midnight (end up to 1440).
+    static let worldClockWorkHoursEnabled = "worldClockWorkHoursEnabled"
+    static let worldClockWorkStart = "worldClockWorkStart"
+    static let worldClockWorkEnd = "worldClockWorkEnd"
     static let menuBarPreset = "menuBarPreset"           // dense
     static let menuBarMetricSpacing = "menuBarMetricSpacing" // standard | compact
     static let menuBarMetricAppearance = "menuBarMetricAppearance" // values | bars
@@ -1226,6 +1240,7 @@ enum Defaults {
         "memory",
         "battery", "batteryTime", "batteryTemperature", "peripheralBattery",
         "network", "diskUsage", "diskActivity", "connectedDevices", "power", "fanSpeed",
+        "worldClock",
     ]
     static let allowedMenuBarLabelStyles = ["compact", "classic"]
     static let allowedMenuBarMemoryStyles = ["dot", "percent", "both"]
@@ -1678,6 +1693,7 @@ enum Defaults {
         DefaultsKey.panelShowControls: true,
         DefaultsKey.panelShowToggles: true,
         DefaultsKey.panelShowWallpaper: true,
+        DefaultsKey.panelShowWorldClock: true,
         DefaultsKey.panelToggleDarkMode: true,
         DefaultsKey.panelToggleKeyboardLight: true,
         DefaultsKey.panelToggleMicMute: true,
@@ -1703,6 +1719,15 @@ enum Defaults {
         DefaultsKey.menuBarPeripheralBattery: false,
         DefaultsKey.menuBarConnectedDevices: false,
         DefaultsKey.menuBarFanSpeed: false,
+        DefaultsKey.menuBarWorldClock: false,
+        DefaultsKey.worldClockZones: WorldClockSupport.localID,
+        DefaultsKey.worldClockMenuBarZones: WorldClockSupport.localID,
+        DefaultsKey.worldClockMenuBarLabels: false,
+        DefaultsKey.worldClockDragLeftForward: false,
+        DefaultsKey.worldClockShortLabels: [String: String](),
+        DefaultsKey.worldClockWorkHoursEnabled: true,
+        DefaultsKey.worldClockWorkStart: WorldClockSupport.defaultWorkStartMinute,
+        DefaultsKey.worldClockWorkEnd: WorldClockSupport.defaultWorkEndMinute,
         DefaultsKey.menuBarPreset: "dense",
         DefaultsKey.menuBarMetricSpacing: "compact",  // owner's call: compact by default in 3.1.8
         DefaultsKey.menuBarMetricAppearance: "values",

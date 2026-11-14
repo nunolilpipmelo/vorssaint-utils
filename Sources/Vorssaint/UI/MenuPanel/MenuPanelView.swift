@@ -85,6 +85,7 @@ struct MenuPanelView: View {
     @AppStorage(DefaultsKey.panelShowControls) private var showControls = true
     @AppStorage(DefaultsKey.panelShowToggles) private var showToggles = true
     @AppStorage(DefaultsKey.panelShowWallpaper) private var showWallpaper = true
+    @AppStorage(DefaultsKey.panelShowWorldClock) private var showWorldClock = true
     @AppStorage(DefaultsKey.panelSectionOrder) private var sectionOrderRaw = ""
     @State private var navigableContentHeight: CGFloat = 0
     @State private var metricContentHeight: CGFloat = 0
@@ -191,7 +192,7 @@ struct MenuPanelView: View {
             .frame(height: 38)
             OverlayScrollView(measuredHeight: $navigableContentHeight) {
                 Group {
-                    if let selectedMetric { MetricDetailView(kind: selectedMetric) }
+                    if let selectedMetric { metricDetail(selectedMetric) }
                     else { section(for: activeSection, collapsible: false) }
                 }
                 .frame(width: size.width)
@@ -235,7 +236,7 @@ struct MenuPanelView: View {
             if let selectedMetric {
                 metricNavigationHeader(selectedMetric)
                 OverlayScrollView(measuredHeight: $metricContentHeight) {
-                    MetricDetailView(kind: selectedMetric)
+                    metricDetail(selectedMetric)
                         .frame(width: 308)
                 }
                 .frame(width: 308, height: metricScrollHeight)
@@ -246,6 +247,17 @@ struct MenuPanelView: View {
         .padding(12)
         .frame(width: 332, height: metricPanelHeight)
         .panelGlassSurface()
+    }
+
+    /// A reading's detail, or the World Clock section on its own when its
+    /// menu bar item was clicked.
+    @ViewBuilder
+    private func metricDetail(_ kind: MetricDetailKind) -> some View {
+        if kind == .worldClock {
+            WorldClockSection(collapsible: false)
+        } else {
+            MetricDetailView(kind: kind)
+        }
     }
 
     /// The major sections in the user's saved order. Reading `sectionOrderRaw`
@@ -304,6 +316,7 @@ struct MenuPanelView: View {
         case .controls: return 360
         case .toggles: return 420
         case .wallpaper: return 480
+        case .worldClock: return 360
         }
     }
 
@@ -315,6 +328,7 @@ struct MenuPanelView: View {
         case .disk: return 360
         case .battery, .power: return 360
         case .fan, .connectedDevices: return 240
+        case .worldClock: return 360
         }
     }
 
@@ -347,6 +361,7 @@ struct MenuPanelView: View {
         case .controls: QuickControlsSection(collapsible: collapsible)
         case .toggles: QuickTogglesSection(collapsible: collapsible)
         case .wallpaper: if showWallpaper { WallpaperSection(collapsible: collapsible) }
+        case .worldClock: if showWorldClock { WorldClockSection(collapsible: collapsible) }
         }
     }
 
@@ -364,7 +379,8 @@ struct MenuPanelView: View {
     /// what keeps the tabs refreshing when Settings flips one of them.
     private func isSectionVisible(_ id: PanelSectionID) -> Bool {
         _ = (showKeepAwake, showBrightness, brightnessEnabled, showMixer, showSystem, showNetwork,
-             showDisk, showPower, showFanControl, showUtilities, showControls, showToggles, showWallpaper)
+             showDisk, showPower, showFanControl, showUtilities, showControls, showToggles, showWallpaper,
+             showWorldClock)
         return PanelLayout.isVisibleInPanel(id)
     }
 

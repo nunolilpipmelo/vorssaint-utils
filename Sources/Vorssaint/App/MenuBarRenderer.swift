@@ -5,7 +5,7 @@ import AppKit
 
 /// A live reading the user can pin next to the menu bar icon.
 enum MenuBarMetric: String, CaseIterable, Identifiable {
-    case cpu, gpu, memory, cpuTemperature, gpuTemperature, batteryTemperature, network, diskUsage, diskActivity, battery, batteryTime, peripheralBattery, power, fanSpeed, connectedDevices
+    case cpu, gpu, memory, cpuTemperature, gpuTemperature, batteryTemperature, network, diskUsage, diskActivity, battery, batteryTime, peripheralBattery, power, fanSpeed, connectedDevices, worldClock
 
     var id: String { rawValue }
 
@@ -26,6 +26,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         case .power: return DefaultsKey.menuBarPower
         case .connectedDevices: return DefaultsKey.menuBarConnectedDevices
         case .fanSpeed: return DefaultsKey.menuBarFanSpeed
+        case .worldClock: return DefaultsKey.menuBarWorldClock
         }
     }
 
@@ -46,6 +47,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         case .connectedDevices: return "cable.connector"
         case .power: return "powerplug.fill"
         case .fanSpeed: return "fanblades"
+        case .worldClock: return "globe"
         }
     }
 
@@ -66,6 +68,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         case .connectedDevices: return FeatureStrings.connectedDevices(L10n.shared.language).title
         case .power: return strings.monitorShowPowerLabel
         case .fanSpeed: return FeatureStrings.fanControl(L10n.shared.language).menuBarTitle
+        case .worldClock: return FeatureStrings.worldClock(L10n.shared.language).title
         }
     }
 
@@ -75,6 +78,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         .memory,
         .battery, .batteryTime, .batteryTemperature, .peripheralBattery,
         .network, .diskUsage, .diskActivity, .connectedDevices, .power, .fanSpeed,
+        .worldClock,
     ]
 
     static func order(in defaults: UserDefaults) -> [MenuBarMetric] {
@@ -100,8 +104,13 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
         case .connectedDevices: return .connectedDevices
         case .battery, .batteryTime, .batteryTemperature, .peripheralBattery, .power: return .monitorPower
         case .fanSpeed: return .fanControl
+        case .worldClock: return .worldClock
         }
     }
+
+    /// Whether the reading comes from the system monitor. The clock reads
+    /// only the time, so on its own it must not keep the sampler running.
+    var needsSampling: Bool { self != .worldClock }
 
     var isAvailableOnCurrentHardware: Bool {
         switch self {
@@ -120,6 +129,10 @@ enum MenuBarMetric: String, CaseIterable, Identifiable {
                 && defaults.bool(forKey: $0.feature.availabilityKey)
                 && $0.isAvailableOnCurrentHardware
         }
+    }
+
+    static func anySampledEnabled(in defaults: UserDefaults) -> Bool {
+        enabled(in: defaults).contains(where: \.needsSampling)
     }
 
     static func anyEnabled(in defaults: UserDefaults) -> Bool {
@@ -202,6 +215,8 @@ enum MenuBarSegment {
     case usageBarBlock(label: String, fraction: Double?, style: MenuBarBlockStyle, pressure: MemoryPressure?)
     case networkBlock(down: String, up: String, style: MenuBarBlockStyle)
     case diskActivityBlock(read: String, write: String, style: MenuBarBlockStyle)
+    /// One or two clock lines; `reservedTime` is the widest time it may need.
+    case clockBlock(lines: [WorldClockSupport.MenuBarLine], reservedTime: String, style: MenuBarBlockStyle)
     case batteryBlock(percent: Int, isCharging: Bool, externalConnected: Bool,
                       warning: BatteryWarning = .none, style: MenuBarBlockStyle)
     case dot(MemoryPressure)
@@ -588,6 +603,20 @@ enum MenuBarRenderer {
                                                 style: style,
                                                 pressure: nil)])
                 }
+            case .worldClock:
+                let defaults = UserDefaults.standard
+                let zones = WorldClockSupport.menuBarZones(
+                    pinned: WorldClockSupport.parse(defaults.string(forKey: DefaultsKey.worldClockMenuBarZones) ?? ""),
+                    listed: WorldClockSupport.parse(defaults.string(forKey: DefaultsKey.worldClockZones) ?? ""))
+                let showLabels = defaults.bool(forKey: DefaultsKey.worldClockMenuBarLabels)
+                let lines = WorldClockSupport.menuBarLines(
+                    now: Date(), zones: zones, showLabels: showLabels,
+                    labels: defaults.dictionary(forKey: DefaultsKey.worldClockShortLabels) as? [String: String] ?? [:])
+                if !lines.isEmpty {
+                    groups.append([.clockBlock(lines: lines,
+                                               reservedTime: WorldClockSupport.menuBarReservedTime(),
+                                               style: style)])
+                }
             case .fanSpeed:
                 if let value = FanControlPolicy.menuBarValue(for: snapshot.fanSpeeds) {
                     let minimumValue = Array(repeating: "20000", count: snapshot.fanSpeeds.count)
@@ -677,6 +706,8 @@ enum MenuBarRenderer {
             return 12      // clock symbol + "99h 59m"
         case (_, .connectedDevices):
             return 6       // symbol + " 99"
+        case (_, .worldClock):
+            return 8       // "00:00PM"
         case (_, .fanSpeed):
             let count = max(1, SystemMonitor.fanTelemetryCount)
             return FanControlPolicy.menuBarWidthUnits(fanCount: count)
@@ -745,6 +776,8 @@ enum MenuBarRenderer {
                 result.append(networkBlockAttachment(down: down, up: up, style: style))
             case let .diskActivityBlock(read, write, style):
                 result.append(diskActivityBlockAttachment(read: read, write: write, style: style))
+            case let .clockBlock(lines, reservedTime, style):
+                result.append(clockBlockAttachment(lines: lines, reservedTime: reservedTime, style: style))
             case let .batteryBlock(percent, isCharging, externalConnected, warning, style):
                 result.append(batteryBlockAttachment(percent: percent,
                                                      isCharging: isCharging,
@@ -827,6 +860,82 @@ enum MenuBarRenderer {
                                    width: image.size.width,
                                    height: image.size.height)
         return NSAttributedString(attachment: attachment)
+    }
+
+    private static func clockBlockAttachment(lines: [WorldClockSupport.MenuBarLine],
+                                             reservedTime: String,
+                                             style: MenuBarBlockStyle) -> NSAttributedString {
+        let image = clockBlockImage(lines: lines, reservedTime: reservedTime, style: style)
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = NSRect(x: 0,
+                                   y: (style == .readable ? -6.1 : -5.5) + legacyBlockAttachmentNudge,
+                                   width: image.size.width,
+                                   height: image.size.height)
+        return NSAttributedString(attachment: attachment)
+    }
+
+    static func clockBlockFont(lineCount: Int, style: MenuBarBlockStyle) -> NSFont {
+        let size: CGFloat = lineCount > 1
+            ? networkBlockFontSize(style: style)
+            : (style == .readable ? 13.0 : 12.0)
+        return NSFont.monospacedDigitSystemFont(ofSize: size, weight: .semibold)
+    }
+
+    /// The gap between a label and its time on a stacked line.
+    static let clockLabelGap: CGFloat = 4
+
+    /// One time centered at the size of a metric value, or two stacked at
+    /// the size of the network rates: labels flush left, times flush right,
+    /// so the times line up whatever the labels' lengths.
+    private static func clockBlockImage(lines: [WorldClockSupport.MenuBarLine],
+                                        reservedTime: String,
+                                        style: MenuBarBlockStyle) -> NSImage {
+        let linesKey = lines.map { "\($0.label ?? "")\u{1F}\($0.time)" }.joined(separator: "|")
+        let cacheKey = "clock|\(linesKey)|\(reservedTime)|\(style)" as NSString
+        if let cached = blockImageCache.object(forKey: cacheKey) { return cached }
+
+        let font = clockBlockFont(lineCount: lines.count, style: style)
+        let attrs = dynamicTextAttributes(font: font)
+        let sizing: [NSAttributedString.Key: Any] = [.font: font]
+        func width(_ text: String) -> CGFloat { (text as NSString).size(withAttributes: sizing).width }
+        let stacked = lines.count > 1
+        let timeWidth = ([reservedTime] + lines.map(\.time)).map(width).max() ?? 30
+        let labelWidth = lines.compactMap(\.label).map(width).max() ?? 0
+        let contentWidth: CGFloat
+        if stacked {
+            contentWidth = labelWidth > 0 ? labelWidth + clockLabelGap + timeWidth : timeWidth
+        } else {
+            contentWidth = max(width(lines.first?.joined ?? ""), width(reservedTime))
+        }
+        let imageSize = NSSize(width: ceil(contentWidth) + (style == .readable ? 1.5 : 1.0),
+                               height: style == .readable ? 22 : 20)
+        let lineHeight = networkBlockLineHeight(style: style)
+        let image = NSImage(size: imageSize, flipped: false) { rect in
+            NSColor.clear.setFill()
+            rect.fill()
+            let textHeight = (reservedTime as NSString).size(withAttributes: sizing).height
+            if stacked {
+                let bottomY = (imageSize.height - (lineHeight + textHeight)) / 2
+                for (index, line) in lines.prefix(2).enumerated() {
+                    let y = bottomY + lineHeight * CGFloat(1 - index)
+                    if let label = line.label {
+                        (label as NSString).draw(at: NSPoint(x: 0.5, y: y), withAttributes: attrs)
+                    }
+                    let x = imageSize.width - width(line.time) - 0.5
+                    (line.time as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: attrs)
+                }
+            } else if let line = lines.first {
+                let text = line.joined
+                (text as NSString).draw(at: NSPoint(x: max(0, (imageSize.width - width(text)) / 2),
+                                                    y: (imageSize.height - textHeight) / 2),
+                                        withAttributes: attrs)
+            }
+            return true
+        }
+        image.isTemplate = false
+        blockImageCache.setObject(image, forKey: cacheKey, cost: blockImageCost(image))
+        return image
     }
 
     private static func networkBlockAttachment(down: String, up: String, style: MenuBarBlockStyle) -> NSAttributedString {

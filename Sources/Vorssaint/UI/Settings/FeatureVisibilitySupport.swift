@@ -440,6 +440,10 @@ extension AppFeature {
             return FeatureSettingsDestination(.monitor)
         case .fanControl:
             return FeatureSettingsDestination(.monitor, sectionAnchor: .fanControl)
+        // Its menu bar tile sits with the other readings; the zones
+        // themselves are edited in its panel section.
+        case .worldClock:
+            return FeatureSettingsDestination(.monitor)
         }
     }
 }
@@ -457,7 +461,7 @@ enum FeatureVisibilitySupport {
     static func features(for page: SettingsPage) -> [AppFeature] {
         switch page {
         case .energy: return [.keepAwake, .brightness, .extraBrightness, .bluetoothSleep]
-        case .monitor: return monitorFeatures
+        case .monitor: return monitorFeatures + [.worldClock]
         case .mouse: return [.scrollInverter, .scrollHorizontal, .scrollZoom, .focusFollowsMouse, .smoothScroll, .linearScroll, .scrollSpeed, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts,
                              .middleClick, .mouseClickDebounce]
         case .switcher: return [.switcher]

@@ -6,6 +6,9 @@ import SwiftUI
 
 enum MetricDetailKind: String, Equatable, Identifiable {
     case cpu, gpu, memory, network, disk, battery, power, fan, connectedDevices
+    /// Not a system reading: its focused view is the World Clock section,
+    /// opened from its own menu bar item the way the readings open theirs.
+    case worldClock
 
     var id: String { rawValue }
 
@@ -21,6 +24,8 @@ enum MetricDetailKind: String, Equatable, Identifiable {
             return .power
         case .fan:
             return .fanControl
+        case .worldClock:
+            return .worldClock
         }
     }
 
@@ -35,6 +40,7 @@ enum MetricDetailKind: String, Equatable, Identifiable {
         case .power: return "powerplug.fill"
         case .fan: return "fanblades"
         case .connectedDevices: return "cable.connector"
+        case .worldClock: return "globe"
         }
     }
 
@@ -64,6 +70,8 @@ enum MetricDetailKind: String, Equatable, Identifiable {
             return SystemMonitorPanelNeeds(fanSpeed: true)
         case .connectedDevices:
             return SystemMonitorPanelNeeds(connectedDevices: true)
+        case .worldClock:
+            return .none
         }
     }
 
@@ -78,6 +86,7 @@ enum MetricDetailKind: String, Equatable, Identifiable {
         case .power: return s.powerSection
         case .fan: return FeatureStrings.fanControl(L10n.shared.language).menuBarTitle
         case .connectedDevices: return FeatureStrings.connectedDevices(L10n.shared.language).title
+        case .worldClock: return FeatureStrings.worldClock(L10n.shared.language).title
         }
     }
 
@@ -88,7 +97,7 @@ enum MetricDetailKind: String, Equatable, Identifiable {
         case .memory: return .memory
         case .power: return .energy
         case .network: return .network
-        case .disk, .battery, .fan, .connectedDevices: return nil
+        case .disk, .battery, .fan, .connectedDevices, .worldClock: return nil
         }
     }
 }
@@ -114,6 +123,8 @@ extension MenuBarMetric {
             return .fan
         case .connectedDevices:
             return .connectedDevices
+        case .worldClock:
+            return .worldClock
         }
     }
 }
@@ -239,7 +250,7 @@ struct MetricDetailView: View {
             let peak = MetricFormat.graphCeiling(monitor.snapshot.systemPowerHistory.max() ?? 0, unitStep: 1000)
             historyGraph(monitor.snapshot.systemPowerHistory, color: summaryColor, maxValue: peak,
                          ceilingLabel: MetricFormat.watts(peak))
-        case .fan, .connectedDevices:
+        case .fan, .connectedDevices, .worldClock:
             EmptyView()
         }
     }
@@ -482,6 +493,9 @@ struct MetricDetailView: View {
                     device.vendorName ?? "",
                     symbolName: "cable.connector")
             }
+        case .worldClock:
+            // Drawn by WorldClockSection; the panel never builds this view for it.
+            return []
         }
     }
 
@@ -514,6 +528,8 @@ struct MetricDetailView: View {
             return String(format: strings.rpmFormat, Int(rpm.rounded()))
         case .connectedDevices:
             return "\(snapshot.connectedDevices.count)"
+        case .worldClock:
+            return ""
         }
     }
 
@@ -553,6 +569,8 @@ struct MetricDetailView: View {
             let count = snapshot.connectedDevices.count
             let strings = FeatureStrings.connectedDevices(l10n.language)
             return strings.formattedCount(count)
+        case .worldClock:
+            return ""
         }
     }
 
@@ -570,7 +588,7 @@ struct MetricDetailView: View {
             return PanelMetricColor.green(for: colorScheme)
         case .power:
             return PanelMetricColor.orange(for: colorScheme)
-        case .fan, .connectedDevices:
+        case .fan, .connectedDevices, .worldClock:
             return PanelMetricColor.cyan(for: colorScheme)
         }
     }

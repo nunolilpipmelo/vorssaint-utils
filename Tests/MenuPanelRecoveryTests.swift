@@ -8,6 +8,12 @@ private typealias PanelRecoveryPolicy = StatusItemAnchorSupport
 
 /// Current production close, show and geometry methods against controlled windows.
 /// Native event objects are data only; nothing is posted and no window is created.
+/// The doubles stand in for MetricDetailKind with String, so the one kind
+/// the panel names directly needs a String spelling too.
+extension String {
+    static let worldClock = "worldClock"
+}
+
 enum MenuPanelRecoveryTests {
     final class Queue {
         var jobs: [() -> Void] = []

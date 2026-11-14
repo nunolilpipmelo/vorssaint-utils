@@ -11,7 +11,7 @@ protocol PanelOrderItem: RawRepresentable, CaseIterable, Hashable where RawValue
 /// renaming a case would orphan a user's stored layout — keep them stable.
 enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
     case keepAwake, brightness, mixer, system, network, disk, power, fanControl, utilities, controls,
-         toggles, wallpaper
+         toggles, wallpaper, worldClock
 
     var id: String { rawValue }
 
@@ -30,6 +30,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return s.quickControlsSection
         case .toggles: return FeatureStrings.quickToggles(L10n.shared.language).pageTitle
         case .wallpaper: return FeatureStrings.wallpaper(L10n.shared.language).pageTitle
+        case .worldClock: return FeatureStrings.worldClock(L10n.shared.language).title
         }
     }
 
@@ -47,6 +48,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return "switch.2"
         case .toggles: return "togglepower"
         case .wallpaper: return "photo.on.rectangle"
+        case .worldClock: return "globe"
         }
     }
 
@@ -67,6 +69,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
         case .controls: return DefaultsKey.panelShowControls
         case .toggles: return DefaultsKey.panelShowToggles
         case .wallpaper: return DefaultsKey.panelShowWallpaper
+        case .worldClock: return DefaultsKey.panelShowWorldClock
         }
     }
 
@@ -98,6 +101,7 @@ enum PanelSectionID: String, CaseIterable, Identifiable, Hashable {
                                 .middleClick, .textSnippets, .superKey, .radialMenu, .mouseClickDebounce, .notch]
         case .toggles: return [.quickToggles, .micMute, .quitApps]
         case .wallpaper: return [.wallpaper]
+        case .worldClock: return [.worldClock]
         }
     }
 
@@ -355,7 +359,9 @@ struct PanelDragHandle: View {
     }
 }
 
-struct PanelReorderableItem<Item: PanelOrderItem, Content: View>: View {
+/// Any hashable item can be dragged: the drop reads the item from the
+/// shared `dragging` binding, never from the pasteboard payload.
+struct PanelReorderableItem<Item: Hashable, Content: View>: View {
     let item: Item
     var isEnabled = true
     /// Rows inside a `PanelRowGroup` have no card of their own, so the one
@@ -394,11 +400,11 @@ struct PanelReorderableItem<Item: PanelOrderItem, Content: View>: View {
 
     private func itemProvider() -> NSItemProvider {
         dragging = item
-        return NSItemProvider(object: item.rawValue as NSString)
+        return NSItemProvider(object: String(describing: item) as NSString)
     }
 }
 
-private struct PanelItemDropDelegate<Item: PanelOrderItem>: DropDelegate {
+private struct PanelItemDropDelegate<Item: Hashable>: DropDelegate {
     let item: Item
     @Binding var order: [Item]
     @Binding var dragging: Item?

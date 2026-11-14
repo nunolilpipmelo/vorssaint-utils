@@ -394,6 +394,7 @@ private struct MenuBarMetricTile: View {
     @AppStorage(DefaultsKey.menuBarMemoryStyle) private var memoryStyle = "percent"
     @AppStorage(DefaultsKey.menuBarNetworkUploadFirst) private var uploadFirst = false
     @AppStorage(DiskMenuBarStyle.defaultsKey) private var diskStyle = DiskMenuBarStyle.percent
+    @AppStorage(DefaultsKey.worldClockMenuBarLabels) private var clockLabels = false
 
     init(metric: MenuBarMetric) {
         self.metric = metric
@@ -412,6 +413,7 @@ private struct MenuBarMetricTile: View {
             return Defaults.sanitizedMenuBarMemoryStyle(memoryStyle) != "percent"
                 ? l10n.s.monitorMemoryPressureDot : FeatureStrings.mouseClickDebounce(l10n.language).moreOptions
         case .network: return uploadFirst ? "↑ ↓" : "↓ ↑"
+        case .worldClock: return clockLabels ? FeatureStrings.worldClock(l10n.language).showLabels : ""
         case .diskUsage:
             switch diskStyle {
             case DiskMenuBarStyle.free: return l10n.s.diskMenuBarAvailableSpace
@@ -435,6 +437,10 @@ private struct MenuBarMetricTile: View {
             return AnyView(MonitorTokenOption(symbol: "arrow.up.arrow.down",
                                                  title: l10n.s.monitorNetworkUploadFirst,
                                                  isOn: $uploadFirst))
+        case .worldClock:
+            return AnyView(MonitorTokenOption(symbol: "textformat",
+                                                 title: FeatureStrings.worldClock(l10n.language).showLabels,
+                                                 isOn: $clockLabels))
         case .diskUsage:
             return AnyView(Picker(l10n.s.diskMenuBarStyleLabel, selection: $diskStyle) {
                 Text(l10n.s.diskMenuBarUsedPercentage).tag(DiskMenuBarStyle.percent)

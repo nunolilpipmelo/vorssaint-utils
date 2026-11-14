@@ -24,6 +24,10 @@ struct MenuBarMetricsPreview: View {
     @AppStorage(DefaultsKey.menuBarPower) private var power = false
     @AppStorage(DefaultsKey.menuBarFanSpeed) private var fanSpeed = false
     @AppStorage(DefaultsKey.menuBarConnectedDevices) private var connectedDevices = false
+    @AppStorage(DefaultsKey.menuBarWorldClock) private var worldClock = false
+    @AppStorage(DefaultsKey.worldClockMenuBarZones) private var worldClockZones = ""
+    @AppStorage(DefaultsKey.worldClockMenuBarLabels) private var worldClockLabels = false
+    @AppStorage(DefaultsKey.worldClockZones) private var worldClockList = ""
     @AppStorage(DefaultsKey.menuBarMetricOrder) private var metricOrder = ""
     @AppStorage(DefaultsKey.menuBarCombineTemperatures) private var combineTemperatures = true
     @AppStorage(DefaultsKey.menuBarMetricAppearance) private var metricAppearance = "values"
@@ -136,6 +140,7 @@ struct MenuBarMetricsPreview: View {
         let _ = power
         let _ = fanSpeed
         let _ = connectedDevices
+        let _ = (worldClock, worldClockZones, worldClockLabels, worldClockList)
         return MenuBarMetric.enabled(in: .standard)
     }
 
@@ -187,6 +192,26 @@ struct MenuBarMetricsPreview: View {
             .frame(width: MenuBarRenderer.rateBlockWidth(style: style),
                    height: style == .readable ? 22 : 20,
                    alignment: .center)
+        case let .clockBlock(lines, _, style):
+            Group {
+                if lines.count > 1 {
+                    Grid(alignment: .leading, horizontalSpacing: MenuBarRenderer.clockLabelGap, verticalSpacing: -0.6) {
+                        ForEach(Array(lines.prefix(2).enumerated()), id: \.offset) { _, line in
+                            GridRow {
+                                Text(line.label ?? "")
+                                Text(line.time)
+                                    .gridColumnAlignment(.trailing)
+                            }
+                        }
+                    }
+                } else {
+                    Text(lines.first?.joined ?? "")
+                }
+            }
+            .lineLimit(1)
+            .font(Font(MenuBarRenderer.clockBlockFont(lineCount: lines.count, style: style)))
+            .foregroundStyle(.white)
+            .frame(minHeight: style == .readable ? 22 : 20)
         case let .diskActivityBlock(read, write, style):
             VStack(alignment: .trailing, spacing: -0.6) {
                 Text("R\(read)")

@@ -255,6 +255,7 @@ struct MetricsTests {
                 WallpaperContract.run(suite)
                 WallpaperThumbnailTests.run(suite)
             }),
+            ("world-clock", { WorldClockContract.run(suite) }),
             ("emoji", { CommandBarEmojiContract.run(suite) }),
         ]
         var selected = Set<String>()

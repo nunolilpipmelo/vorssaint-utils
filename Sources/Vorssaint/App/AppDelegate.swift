@@ -527,7 +527,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     private func showMetricPanel(for metric: MenuBarMetric, anchoredTo button: NSStatusBarButton) {
         let detailKind = metric.detailKind
-        if NotchSupport.routesAppPanel(), NotchService.shared.acceptsSystemFeedback,
+        // The island's system page shows readings only; the clock always
+        // opens in the menu bar panel.
+        if detailKind != .worldClock,
+           NotchSupport.routesAppPanel(), NotchService.shared.acceptsSystemFeedback,
            NotchSupport.modules().contains(.system) {
             NotchService.shared.showMetric(detailKind, toggle: true); return
         }

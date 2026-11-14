@@ -24,6 +24,8 @@ final class StatusItemController {
     private var metricStatusItemFocus: [String: MenuBarMetric] = [:]
     private var cancellables = Set<AnyCancellable>()
     private var titleTimer: Timer?
+    /// Fires on each minute boundary while the world clock is in the menu bar.
+    private var clockTimer: Timer?
     private var defaultsObserver: NSObjectProtocol?
     /// Last combination applied by updateIconAppearance, so refresh ticks
     /// don't re-render an unchanged icon every 2 seconds.
@@ -194,6 +196,12 @@ final class StatusItemController {
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
+        // A clock pinned as "local" follows the Mac to a new zone at once.
+        NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
+
         SystemMonitor.shared.$snapshot
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -266,6 +274,7 @@ final class StatusItemController {
         // so a future "recreate the status item" path can't leak a firing timer or
         // a block observer that outlives this instance.
         titleTimer?.invalidate()
+        clockTimer?.invalidate()
         if let defaultsObserver { NotificationCenter.default.removeObserver(defaultsObserver) }
         for item in metricStatusItems.values {
             NSStatusBar.system.removeStatusItem(item)
@@ -281,7 +290,7 @@ final class StatusItemController {
         let defaults = UserDefaults.standard
         let interval = Defaults.sanitizedMonitorInterval(defaults.integer(forKey: DefaultsKey.monitorInterval))
         SystemMonitor.shared.setInterval(seconds: interval)
-        SystemMonitor.shared.setMenuBarActive(MenuBarMetric.anyEnabled(in: defaults))
+        SystemMonitor.shared.setMenuBarActive(MenuBarMetric.anySampledEnabled(in: defaults))
     }
 
     private func syncTitleTimer(keepAwakeActive: Bool,
@@ -303,6 +312,29 @@ final class StatusItemController {
         timer.tolerance = 5
         RunLoop.main.add(timer, forMode: .common)
         titleTimer = timer
+    }
+
+    /// Keeps a timer on the next minute boundary while a clock is shown, so
+    /// the time turns over with the system clock rather than with the next
+    /// monitor sample, which may be seconds away or not running at all.
+    private func syncClockTimer(showsClock: Bool) {
+        guard showsClock else {
+            clockTimer?.invalidate()
+            clockTimer = nil
+            return
+        }
+        guard clockTimer?.isValid != true else { return }
+        let now = Date()
+        let nextMinute = (now.timeIntervalSinceReferenceDate / 60).rounded(.down) * 60 + 60
+        let timer = Timer(fire: Date(timeIntervalSinceReferenceDate: nextMinute + 0.05),
+                          interval: 0,
+                          repeats: false) { [weak self] _ in
+            self?.clockTimer = nil
+            self?.refresh()
+        }
+        timer.tolerance = 0.2
+        RunLoop.main.add(timer, forMode: .common)
+        clockTimer = timer
     }
 
     private var currentMicBadgeActive: Bool {
@@ -463,6 +495,7 @@ final class StatusItemController {
         syncTitleTimer(keepAwakeActive: manager.isActive,
                        showsCountdown: defaults.bool(forKey: DefaultsKey.showCountdown),
                        endDate: manager.endDate)
+        syncClockTimer(showsClock: metrics.contains(.worldClock))
 
         // Compose the title from the keep-awake countdown (when shown) followed by
         // the pinned live metrics. Built attributed so the memory pressure dot can
@@ -688,7 +721,7 @@ final class StatusItemController {
                                      temperature: .batteryTemperature,
                                      primaryTitle: strings.batteryLabel)
             case .memory, .network, .diskUsage, .diskActivity, .batteryTime, .peripheralBattery, .power,
-                 .fanSpeed, .connectedDevices:
+                 .fanSpeed, .connectedDevices, .worldClock:
                 let id = metric.rawValue
                 guard emittedIDs.insert(id).inserted else { continue }
                 groups.append(MetricStatusGroup(id: id,
