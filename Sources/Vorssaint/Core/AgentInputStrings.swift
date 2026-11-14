@@ -3,7 +3,7 @@
 
 import Foundation
 
-/// The AI section's words for a session waiting on its person.
+/// The AI section’s words for a session waiting on its person.
 struct AgentInputStrings {
     let needsYou: String
     let needYouFormat: String
@@ -11,6 +11,16 @@ struct AgentInputStrings {
     let question: String
     let permission: String
     let waitingFormat: String
+    let settingTitle: String
+    let settingCaption: String
+    let connected: String
+    let notConnected: String
+    let unreadable: String
+    let setUp: String
+    let remove: String
+    let setupCaption: String
+    let setupFailed: String
+    let alertTitle: String
 
     /// "Needs you" for one waiting session, "2 need you" for more.
     func waiting(count: Int) -> String {
@@ -55,7 +65,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let ptBR = AgentInputStrings(
@@ -64,7 +84,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let tr = AgentInputStrings(
@@ -73,7 +103,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let ru = AgentInputStrings(
@@ -82,7 +122,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let es = AgentInputStrings(
@@ -91,7 +141,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let sk = AgentInputStrings(
@@ -100,7 +160,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let de = AgentInputStrings(
@@ -109,7 +179,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let fr = AgentInputStrings(
@@ -118,7 +198,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let it = AgentInputStrings(
@@ -127,7 +217,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let ja = AgentInputStrings(
@@ -136,7 +236,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let ko = AgentInputStrings(
@@ -145,7 +255,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let uk = AgentInputStrings(
@@ -154,7 +274,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let zhHans = AgentInputStrings(
@@ -163,7 +293,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let zhHK = AgentInputStrings(
@@ -172,7 +312,17 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 
     static let zhTW = AgentInputStrings(
@@ -181,6 +331,16 @@ private extension AgentInputStrings {
         noticeTitleFormat: "%@ needs you",
         question: "Question",
         permission: "Permission",
-        waitingFormat: "waiting %@"
+        waitingFormat: "waiting %@",
+        settingTitle: "Show when Claude needs you",
+        settingCaption: "A question mark and \"Needs you\" while Claude Code waits for an answer or a permission.",
+        connected: "Connected to Claude Code",
+        notConnected: "Claude Code isn’t connected",
+        unreadable: "Claude Code’s settings file couldn’t be read",
+        setUp: "Set up",
+        remove: "Remove",
+        setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
+        setupFailed: "Couldn’t change Claude Code’s settings.",
+        alertTitle: "When Claude needs you"
     )
 }

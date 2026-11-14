@@ -171,7 +171,18 @@ enum NotchAgentSupport {
     /// Claude's hook reports them, so none while Claude is left out.
     static func waitingRequests(_ requests: [AgentInputRequest] = AgentInputMonitor.shared.requests,
                                 in defaults: UserDefaults = .standard) -> [AgentInputRequest] {
-        providers(in: defaults).contains(.claude) ? requests : []
+        showsNeedsInput(in: defaults) ? requests : []
+    }
+
+    /// Whether Claude waiting on its person shows: live activity on, Claude
+    /// followed and the option itself on. The hook may still be missing.
+    static func showsNeedsInput(in defaults: UserDefaults = .standard) -> Bool {
+        showsLiveActivity(in: defaults) && providers(in: defaults).contains(.claude)
+            && (defaults.object(forKey: DefaultsKey.notchAgentsNeedsInput) as? Bool ?? true)
+    }
+
+    static func needsInputAlert(in defaults: UserDefaults = .standard) -> Bool {
+        showsNeedsInput(in: defaults) && (defaults.object(forKey: DefaultsKey.notchAgentsNeedsInputAlert) as? Bool ?? true)
     }
 
     static func showsLiveActivity(in defaults: UserDefaults = .standard) -> Bool {
@@ -225,6 +236,14 @@ enum NotchAgentSupport {
     static let stripCameraGap: CGFloat = 6
 
     static func stripTextSize(height: CGFloat) -> CGFloat { min(15, height - 7) }
+
+    /// The agent strip's reading, "Needs you" included, at the size of a
+    /// notice's title (NotchCapsuleLayout.titleFont), so the strip and the
+    /// notices it leads to read as one voice.
+    static let agentReadingMaximum: CGFloat = 12
+    static func agentStripTextSize(height: CGFloat) -> CGFloat {
+        min(agentReadingMaximum, stripTextSize(height: height))
+    }
 
     /// What the strip shows beside the camera while agents work: the reading
     /// the person chose, or the time elapsed while that one is unknown.

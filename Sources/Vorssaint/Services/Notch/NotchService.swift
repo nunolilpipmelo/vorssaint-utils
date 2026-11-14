@@ -808,7 +808,7 @@ final class NotchService: ObservableObject {
     /// and air beside the camera.
     private func agentStripWing(in geometry: NotchGeometry) -> CGFloat {
         let provisional = geometry.compactAgentGeometry(wing: NotchAgentSupport.stripWingRange.lowerBound)
-        let size = NotchAgentSupport.stripTextSize(height: provisional.compactActivityContentHeight)
+        let size = NotchAgentSupport.agentStripTextSize(height: provisional.compactActivityContentHeight)
         let shape = NotchAgentSupport.readingShape(NotchAgentSupport.liveReading(
             AgentUsageService.shared.snapshot, waiting: NotchAgentSupport.waitingRequests(),
             readout: NotchAgentSupport.readout(),
@@ -4249,7 +4249,7 @@ final class NotchService: ObservableObject {
         }
         // Sessions waiting on the person come from Claude Code's hook, not
         // the logs, and only matter while live activity shows.
-        if modules.contains(.agents), NotchAgentSupport.showsLiveActivity() {
+        if modules.contains(.agents), NotchAgentSupport.showsNeedsInput() {
             AgentInputMonitor.shared.start()
             AgentInputMonitor.shared.$requests
                 .map { $0.map(\.session) }
@@ -4364,8 +4364,7 @@ final class NotchService: ObservableObject {
     /// A session has just started waiting: one notice that says why, and a
     /// click on it brings the session's app forward.
     private func showInputRequest(_ request: AgentInputRequest) {
-        guard NotchAgentSupport.showsLiveActivity(),
-              NotchAgentSupport.providers().contains(.claude) else { return }
+        guard NotchAgentSupport.needsInputAlert() else { return }
         let text = FeatureStrings.agentInput(L10n.shared.language)
         show(NotchNotice(event: .agents, title: text.noticeTitle(AgentProvider.claude.displayName),
                          detail: [text.reason(request.reason), request.project]
