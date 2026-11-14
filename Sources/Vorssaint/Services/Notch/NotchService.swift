@@ -4385,7 +4385,7 @@ final class NotchService: ObservableObject {
         show(NotchNotice(event: .agents, title: text.noticeTitle(AgentProvider.claude.displayName),
                          detail: [text.reason(request.reason), request.project]
                             .filter { !$0.isEmpty }.joined(separator: " · "),
-                         symbol: "questionmark", agent: .claude, inputRequest: request))
+                         symbol: AgentDotAnimation.question.noticeSymbol, agent: .claude, inputRequest: request))
     }
 
     private func showAgentEvent(_ event: AgentUsageEvent) {
@@ -4404,7 +4404,10 @@ final class NotchService: ObservableObject {
             show(NotchNotice(event: .agents, title: text.finished(provider.displayName),
                              detail: [AgentFormat.duration(duration, locale: locale), cost > 0 ? AgentFormat.cost(cost) : ""]
                                 .filter { !$0.isEmpty }.joined(separator: " · "),
-                             symbol: provider.symbol, agent: provider))
+                             // With a dot animation chosen, the tick draws itself.
+                             symbol: AgentDotAnimation.chosenThinking() != nil
+                                ? AgentDotAnimation.done.noticeSymbol : provider.symbol,
+                             agent: provider))
             // After the notice, the companion cheers the finished task.
             reactMascot(.celebrate)
         case .limitWarning(let provider, let limit):

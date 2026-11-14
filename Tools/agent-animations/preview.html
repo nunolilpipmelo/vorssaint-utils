@@ -1,0 +1,212 @@
+<title>Island Dot Marks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a notch mock-up at the top, then one row per state: thinking variants in dropdown order, question, done */
+:root {
+  --bg: #f4f3f1;
+  --surface: #ffffff;
+  --fg: #1d1b1a;
+  --muted: #6c6661;
+  --line: #e2ded9;
+  --notch: #000000;
+  --notch-fg: #f2efec;
+  --tint: #e8794d;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161514; --surface: #1f1d1c; --fg: #f1eeeb; --muted: #a29b95; --line: #33302d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161514; --surface: #1f1d1c; --fg: #f1eeeb; --muted: #a29b95; --line: #33302d; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 36px 56px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.875rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+.lede { margin: 0; color: var(--muted); line-height: 1.5; max-width: 62ch; }
+h2 { font-family: var(--font-display); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 12px; }
+
+.notch-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.notch {
+  background: var(--notch); color: var(--notch-fg); border-radius: 0 0 16px 16px;
+  width: min(440px, 100%); height: 38px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; font: 500 12px var(--font-body); box-sizing: border-box;
+}
+.notch canvas { width: 14px; height: 14px; }
+.notch .txt { color: var(--tint); font-variant-numeric: tabular-nums; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; font-size: 0.8125rem; color: var(--muted); }
+.swatches { display: inline-flex; gap: 6px; }
+.swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--fg); }
+.toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.toggle input { accent-color: var(--tint); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px; min-width: 0;
+}
+.card.selected { border-color: var(--tint); box-shadow: 0 0 0 1px var(--tint); }
+.screen { background: var(--notch); border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px 10px; }
+.screen .big { width: 64px; height: 64px; }
+.screen .small { width: 14px; height: 14px; }
+.screen .tiny { width: 9px; height: 9px; }
+.head { display: flex; align-items: baseline; gap: 8px; }
+.pos { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.name { font-family: var(--font-display); font-weight: 500; font-size: 1rem; }
+.desc { margin: 0; font-size: 0.8125rem; line-height: 1.45; color: var(--muted); }
+.meta { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); }
+.card button.use, .card button.replay {
+  align-self: flex-start; font: 500 0.8125rem var(--font-body); color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; cursor: pointer;
+}
+.note { font-size: 0.8125rem; color: var(--muted); line-height: 1.5; margin: 0; max-width: 64ch; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Island Dot Marks</h1>
+    <p class="lede">5 × 5 dot animations for the Claude agent in Vorssaint's Dynamic Island. Everything here is drawn straight from the JSON files, frame by frame at each file's fps, so what you see is what the app will get.</p>
+  </header>
+
+  <section class="notch-wrap" aria-label="Notch preview">
+    <div class="notch">
+      <canvas id="notch-mark" aria-hidden="true"></canvas>
+      <span class="txt" id="notch-text">Thinking</span>
+    </div>
+    <div class="toolbar">
+      <span>Tint</span>
+      <span class="swatches" id="swatches"></span>
+      <label class="toggle" for="still"><input type="checkbox" id="still"> Reduce Motion (show still frames)</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Thinking · dropdown order</h2>
+    <div class="grid" id="thinking"></div>
+  </section>
+
+  <section>
+    <h2>Question and done</h2>
+    <div class="grid" id="states"></div>
+  </section>
+
+  <p class="note">Each card shows the mark at preview size, at 14 pt (the notch) and at 9 pt (lists). Dim dots are the files' "2" values, drawn here at 45% strength. Click "Use in notch" to try a thinking variant in the mock-up above.</p>
+</div>
+
+<script>
+const ANIMS = [{"file":"thinking-bloom.json","name":"Bloom","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["12021","20002","00000","20002","12021"],["10001","00000","00100","00000","10001"],["20002","00000","00100","00000","20002"],["00000","00000","00100","00000","00000"],["00000","00200","02120","00200","00000"],["00000","00100","01110","00100","00000"],["00000","02120","01110","02120","00000"],["00000","01110","01110","01110","00000"],["00200","01110","21112","01110","00200"],["02120","21112","11111","21112","02120"],["01110","11111","11111","11111","01110"],["21112","11111","11111","11111","21112"],["11111","11111","11011","11111","11111"],["11111","11111","11011","11111","11111"],["11111","11111","11011","11111","11111"],["11111","11111","11011","11111","11111"],["11111","11011","10001","11011","11111"],["11111","12021","10001","12021","11111"],["11111","10001","10001","10001","11111"],["11211","10001","20002","10001","11211"]],"still":10},{"file":"thinking-snake.json","name":"Snake","state":"thinking","grid":[5,5],"fps":12,"loop":true,"frames":[["10000","00000","02100","02000","00000"],["11000","00000","02200","00000","00000"],["21100","00000","00200","00000","00000"],["22110","00000","00000","00000","00000"],["02211","00000","00000","00000","00000"],["00221","00001","00000","00000","00000"],["00022","00001","00001","00000","00000"],["00002","00002","00001","00001","00000"],["00000","00002","00002","00001","00001"],["00000","00000","00002","00002","00011"],["00000","00000","00000","00002","00112"],["00000","00000","00000","00000","01122"],["00000","00000","00000","00000","11220"],["00000","00000","00000","10000","12200"],["00000","00000","10000","10000","22000"],["00000","10000","10000","20000","20000"],["00000","11000","20000","20000","00000"],["00000","21100","20000","00000","00000"],["00000","22110","00000","00000","00000"],["00000","02210","00010","00000","00000"],["00000","00220","00010","00010","00000"],["00000","00020","00020","00110","00000"],["00000","00000","00020","01120","00000"],["00000","00000","01000","01220","00000"],["00000","00000","01100","02200","00000"]],"still":9},{"file":"thinking-sweep.json","name":"Sweep","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["20000","00000","00000","00000","00000"],["12000","20000","00000","00000","00000"],["21200","12000","20000","00000","00000"],["02120","21200","12000","20000","00000"],["00212","02120","21200","12000","20000"],["00021","00212","02120","21200","12000"],["00002","00021","00212","02120","21200"],["00000","00002","00021","00212","02120"],["00000","00000","00002","00021","00212"],["00000","00000","00000","00002","00021"],["00000","00000","00000","00000","00002"],["00000","00000","00000","00002","00021"],["00000","00000","00002","00021","00212"],["00000","00002","00021","00212","02120"],["00002","00021","00212","02120","21200"],["00021","00212","02120","21200","12000"],["00212","02120","21200","12000","20000"],["02120","21200","12000","20000","00000"],["21200","12000","20000","00000","00000"],["12000","20000","00000","00000","00000"]],"still":5},{"file":"thinking-gears.json","name":"Gears","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["10000","12200","20100","00000","00000"],["11000","22200","00100","00000","00000"],["21100","02000","02100","00000","00000"],["02110","02000","02100","00000","00000"],["00211","00000","02100","02000","00000"],["00021","00001","02100","02000","00000"],["00002","00001","00101","02200","00000"],["00000","00002","00101","02201","00000"],["00000","00000","00202","00221","00001"],["00000","00000","00200","00222","00011"],["00000","00000","00220","00020","00112"],["00000","00000","00220","00020","01120"],["00000","00020","00220","00000","11200"],["00000","00020","00220","10000","12000"],["00000","00220","10200","10000","20000"],["00000","10220","10200","20000","00000"]],"still":0},{"file":"thinking-equalizer.json","name":"Equalizer","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["01000","01001","11001","11111","11111"],["01000","01001","11011","11111","11111"],["00000","01011","11011","11111","11111"],["00010","10011","11011","11111","11111"],["10010","10011","10011","11111","11111"],["10010","10011","10011","10111","11111"],["10000","10011","10011","10011","11111"],["00000","10001","10011","11011","11111"],["00000","00000","11001","11111","11111"],["00000","01000","11100","11101","11111"],["01000","01100","11100","11100","11111"],["01000","01100","11100","11100","11111"],["00000","01100","11100","11110","11111"],["00000","00100","01110","11110","11111"],["00000","00110","00110","01111","11111"],["00000","00110","00111","00111","11111"],["00100","00110","00111","00111","11111"],["00100","00101","00111","11111","11111"],["00000","00101","11111","11111","11111"],["00000","01001","11101","11111","11111"]],"still":0},{"file":"thinking-rain.json","name":"Rain","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["02000","01000","00200","00100","00020"],["00000","02000","01000","00200","00120"],["10000","02000","01000","00000","00200"],["20000","10000","02000","01000","00000"],["00001","20000","12000","01000","00000"],["00002","00001","20000","12000","01000"],["00000","00002","00001","22000","11000"],["00100","00000","00002","00001","22000"],["00200","00100","00000","00002","02001"],["00000","00200","00100","00000","00002"],["00010","00000","00200","00100","00000"],["00010","00000","00000","00200","00100"],["10020","00010","00000","00000","00200"],["20020","10010","00000","00000","00000"],["00001","20020","10010","00000","00000"],["00002","00021","20010","10000","00000"],["00000","00002","00021","20010","10000"],["01100","00000","00022","00011","20000"],["01200","00100","00000","00022","00011"],["02000","01200","00100","00020","00012"]],"still":3},{"file":"thinking-twinkle.json","name":"Twinkle","state":"thinking","grid":[5,5],"fps":10,"loop":true,"frames":[["00000","10000","02000","00101","00000"],["00000","20200","00000","00201","00000"],["00000","00100","00020","00002","00000"],["00000","00100","00010","00000","00000"],["00000","00200","00010","00020","00000"],["00002","00000","00020","00010","00000"],["00001","00000","00000","00010","00000"],["00001","00000","00000","00020","00002"],["00002","00000","00000","00000","00001"],["00000","00020","00000","02000","00001"],["00000","00010","20200","01000","00002"],["00000","00010","10100","01000","00200"],["00000","00020","10100","02000","00100"],["00000","00000","20200","00000","00100"],["00000","00000","00000","00000","00200"],["00000","00000","00000","00000","00000"],["02000","00002","00002","00000","02000"],["01000","00001","02001","00000","01000"],["01000","20001","01001","00200","01000"],["02000","10002","01002","00102","02000"]],"still":11},{"file":"question.json","name":"Question","state":"question","grid":[5,5],"fps":10,"loop":true,"frames":[["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00100"],["01110","00001","00110","00000","00200"],["01110","00001","00110","00000","00200"],["01110","00001","00110","00000","00200"],["01110","00001","00110","00000","00200"],["01110","00001","00110","00000","00200"],["01110","00001","00110","00000","00200"]],"still":0},{"file":"done.json","name":"Done","state":"done","grid":[5,5],"fps":12,"loop":false,"frames":[["00000","00000","00000","00000","00000"],["00000","00000","00000","20000","00000"],["00000","00000","00000","10000","02000"],["00000","00000","00000","10200","01000"],["00000","00000","00020","10100","01000"],["00000","00002","00010","10100","01000"],["00000","00001","00010","10100","01000"],["00000","00001","00010","10100","01000"],["00000","00001","00010","10100","01000"],["00000","00001","00010","10100","01000"]],"still":9}];
+const DESCS = {
+  Bloom: "Fills out from the centre, hollows to an outline, and fades at the corners as the next bloom begins.",
+  Snake: "A short tail winds along a spiral into the centre, and the next one sets off from the corner.",
+  Sweep: "A diagonal band glides from corner to corner and back, like a scanner.",
+  Gears: "A comet circles the outer ring while a dim one turns the other way inside. The centre breathes.",
+  Equalizer: "Five columns rise and fall at their own pace, like a level meter.",
+  Rain: "Drops with dim trails fall down each column at two speeds.",
+  Twinkle: "Dots glow one at a time at their own moment, like stars.",
+  Question: "A steady question mark whose dot slowly dims and returns. Clearly calmer than any thinking mark.",
+  Done: "The tick draws itself dot by dot, then holds. Plays once.",
+};
+const TINTS = [["#e8794d", "Claude orange"], ["#f2efec", "White"], ["#5ab0ff", "Blue"], ["#7ad37a", "Green"]];
+
+(() => {
+  const reduceOS = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const stillBox = document.getElementById("still");
+  stillBox.checked = reduceOS;
+  let tint = TINTS[0][0];
+
+  // Players: each canvas plays one animation from its own start time.
+  const players = [];
+  function player(canvas, anim, cssSize) {
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = canvas.height = Math.max(1, Math.round(cssSize * dpr));
+    const p = { canvas, ctx: canvas.getContext("2d"), anim, start: performance.now() };
+    players.push(p);
+    return p;
+  }
+
+  function draw(p, now) {
+    const { ctx, canvas, anim } = p, W = canvas.width;
+    const [cols, rows] = anim.grid;
+    let idx;
+    if (stillBox.checked) idx = anim.still;
+    else {
+      const f = Math.floor(((now - p.start) / 1000) * anim.fps);
+      idx = anim.loop ? f % anim.frames.length : Math.min(f, anim.frames.length - 1);
+    }
+    const frame = anim.frames[idx];
+    const cell = W / Math.max(cols, rows), r = cell * 0.36;
+    ctx.clearRect(0, 0, W, W);
+    ctx.fillStyle = tint;
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const ch = frame[y][x];
+      if (ch === "0") continue;
+      ctx.globalAlpha = ch === "1" ? 1 : 0.45;
+      ctx.beginPath();
+      ctx.arc((x + 0.5) * cell, (y + 0.5) * cell, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function card(anim, i, parent) {
+    const el = document.createElement("article");
+    el.className = "card";
+    const len = (anim.frames.length / anim.fps).toFixed(1);
+    el.innerHTML = `
+      <div class="screen"><canvas class="big"></canvas><canvas class="small"></canvas><canvas class="tiny"></canvas></div>
+      <div class="head">${i != null ? `<span class="pos">${i + 1}</span>` : ""}<span class="name"></span></div>
+      <p class="desc"></p>
+      <span class="meta"></span>`;
+    el.querySelector(".name").textContent = anim.name;
+    el.querySelector(".desc").textContent = DESCS[anim.name] || "";
+    el.querySelector(".meta").textContent = `${anim.file} · ${anim.frames.length} frames · ${anim.fps} fps · ${len} s${anim.loop ? " loop" : " once"}`;
+    const ps = [player(el.querySelector(".big"), anim, 64), player(el.querySelector(".small"), anim, 14), player(el.querySelector(".tiny"), anim, 9)];
+    const btn = document.createElement("button");
+    if (anim.state === "thinking") {
+      btn.className = "use"; btn.textContent = "Use in notch";
+      btn.onclick = () => { notch.anim = anim; notch.start = performance.now(); notchText.textContent = "Thinking";
+        document.querySelectorAll(".card").forEach(c => c.classList.remove("selected")); el.classList.add("selected"); };
+    } else {
+      btn.className = "replay"; btn.textContent = anim.loop ? "Show in notch" : "Replay in notch";
+      btn.onclick = () => { const now = performance.now(); ps.forEach(p => (p.start = now));
+        notch.anim = anim; notch.start = now; notchText.textContent = anim.state === "done" ? "Claude finished" : "Needs you";
+        document.querySelectorAll(".card").forEach(c => c.classList.remove("selected")); el.classList.add("selected"); };
+    }
+    el.append(btn);
+    parent.append(el);
+    return el;
+  }
+
+  const notchText = document.getElementById("notch-text");
+  const thinking = ANIMS.filter(a => a.state === "thinking");
+  const notch = player(document.getElementById("notch-mark"), thinking[0], 14);
+  const firstCard = thinking.map((a, i) => card(a, i, document.getElementById("thinking")))[0];
+  firstCard.classList.add("selected");
+  ANIMS.filter(a => a.state !== "thinking").forEach(a => card(a, null, document.getElementById("states")));
+
+  const sw = document.getElementById("swatches");
+  TINTS.forEach(([c, label], i) => {
+    const b = document.createElement("button");
+    b.className = "swatch"; b.style.background = c; b.setAttribute("aria-label", label);
+    b.setAttribute("aria-pressed", String(i === 0));
+    b.onclick = () => { tint = c; document.documentElement.style.setProperty("--tint", c);
+      sw.querySelectorAll(".swatch").forEach(s => s.setAttribute("aria-pressed", String(s === b))); };
+    sw.append(b);
+  });
+
+  function frame(now) { for (const p of players) draw(p, now); requestAnimationFrame(frame); }
+  requestAnimationFrame(frame);
+})();
+</script>

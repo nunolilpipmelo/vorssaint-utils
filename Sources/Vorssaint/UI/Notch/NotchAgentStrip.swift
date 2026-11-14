@@ -114,25 +114,15 @@ struct NotchAgentStrip: View {
     }
 }
 
-/// A question mark in the agent's color that blinks gently while a session
-/// waits on its person; steady when the person asked for reduced motion.
+/// The question mark in dots, in the agent's color, while a session waits
+/// on its person; its still frame when the person asked for reduced motion.
 struct NotchAgentInputGlyph: View {
     let tint: Color
     let size: CGFloat
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var dimmed = false
 
     var body: some View {
-        Image(systemName: "questionmark")
-            .font(.system(size: size, weight: .bold))
-            .foregroundStyle(tint)
+        AgentDotAnimationView(animation: .question, tint: tint, size: size)
             .frame(width: size * 1.45 + 1, height: size + 4)
-            .opacity(dimmed ? 0.35 : 1)
-            .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) { dimmed = true }
-            }
-            .accessibilityHidden(true)
     }
 }
 

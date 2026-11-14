@@ -22,6 +22,7 @@ struct NotchAgentsSettingsControls: View {
     @AppStorage(DefaultsKey.notchAgentsFinishAlert) private var finishAlert = true
     @AppStorage(DefaultsKey.notchAgentsNeedsInput) private var needsInput = true
     @AppStorage(DefaultsKey.notchAgentsNeedsInputAlert) private var needsInputAlert = true
+    @AppStorage(DefaultsKey.notchAgentsAnimation) private var animation = AgentDotAnimation.classicID
     @State private var hookStatus: ClaudeHookSetup.Status?
     @State private var hookFailed = false
     @AppStorage(DefaultsKey.notchAgentsFinishMinimum) private var finishMinimum = NotchAgentSupport.defaultFinishMinimum
@@ -98,6 +99,13 @@ struct NotchAgentsSettingsControls: View {
                 SettingsMenuRow(symbol: "camera.metering.center.weighted", title: text.readout, selection: $readout) {
                     ForEach(NotchAgentReadout.allCases) { option in
                         Text(text.readout(option)).tag(option.rawValue)
+                    }
+                }
+                .padding(.leading, settingsRowTextInset)
+                SettingsMenuRow(symbol: "sparkles", title: inputText.animationTitle, selection: $animation) {
+                    Text(inputText.classic).tag(AgentDotAnimation.classicID)
+                    ForEach(AgentDotAnimation.thinking) { dots in
+                        Text(inputText.animationName(dots.id)).tag(dots.id)
                     }
                 }
                 .padding(.leading, settingsRowTextInset)

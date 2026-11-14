@@ -21,6 +21,15 @@ struct AgentInputStrings {
     let setupCaption: String
     let setupFailed: String
     let alertTitle: String
+    let animationTitle: String
+    let classic: String
+    let bloom: String
+    let snake: String
+    let sweep: String
+    let gears: String
+    let equalizer: String
+    let rain: String
+    let twinkle: String
 
     /// "Needs you" for one waiting session, "2 need you" for more.
     func waiting(count: Int) -> String {
@@ -31,6 +40,20 @@ struct AgentInputStrings {
 
     func reason(_ reason: AgentInputRequest.Reason) -> String {
         reason == .permission ? permission : question
+    }
+
+    /// A thinking animation's name in the settings menu.
+    func animationName(_ id: String) -> String {
+        switch id {
+        case "bloom": return bloom
+        case "snake": return snake
+        case "sweep": return sweep
+        case "gears": return gears
+        case "equalizer": return equalizer
+        case "rain": return rain
+        case "twinkle": return twinkle
+        default: return classic
+        }
     }
 
     func waitingFor(_ duration: String) -> String { String(format: waitingFormat, duration) }
@@ -75,7 +98,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let ptBR = AgentInputStrings(
@@ -94,7 +126,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let tr = AgentInputStrings(
@@ -113,7 +154,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let ru = AgentInputStrings(
@@ -132,7 +182,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let es = AgentInputStrings(
@@ -151,7 +210,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let sk = AgentInputStrings(
@@ -170,7 +238,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let de = AgentInputStrings(
@@ -189,7 +266,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let fr = AgentInputStrings(
@@ -208,7 +294,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let it = AgentInputStrings(
@@ -227,7 +322,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let ja = AgentInputStrings(
@@ -246,7 +350,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let ko = AgentInputStrings(
@@ -265,7 +378,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let uk = AgentInputStrings(
@@ -284,7 +406,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let zhHans = AgentInputStrings(
@@ -303,7 +434,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let zhHK = AgentInputStrings(
@@ -322,7 +462,16 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 
     static let zhTW = AgentInputStrings(
@@ -341,6 +490,15 @@ private extension AgentInputStrings {
         remove: "Remove",
         setupCaption: "Set up adds a small hook to Claude Code’s settings so it can tell Vorssaint when it’s waiting. It only shares the session, the reason and the time, never your messages. A backup of the settings is kept.",
         setupFailed: "Couldn’t change Claude Code’s settings.",
-        alertTitle: "When Claude needs you"
+        alertTitle: "When Claude needs you",
+        animationTitle: "Thinking animation",
+        classic: "Classic",
+        bloom: "Bloom",
+        snake: "Snake",
+        sweep: "Sweep",
+        gears: "Gears",
+        equalizer: "Equalizer",
+        rain: "Rain",
+        twinkle: "Twinkle"
     )
 }
