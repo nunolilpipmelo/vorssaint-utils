@@ -336,6 +336,9 @@ final class NotchService: ObservableObject {
     private var musicRequestWork: DispatchWorkItem?
     /// The next refresh fits the strip to its name, or back, without a swing.
     private var musicStripFitsInPlace = false
+    /// The agent strip trading "Needs you" for a reading, or back: it stays
+    /// on screen and only fits its new width.
+    private var agentStripFitsInPlace = false
     /// The companion's stroll through the closed island, or its moment out
     /// over what the island shows.
     @Published private(set) var mascotVisit: NotchMascotVisit? {
@@ -2665,13 +2668,22 @@ final class NotchService: ObservableObject {
         presentedMusic = shown
     }
 
+    /// The agent strip's reading changed shape, as "Needs you" giving way
+    /// to the time or a timer gaining a digit: it eases to its new width.
+    func fitAgentStrip() {
+        agentStripFitsInPlace = true
+        refreshPresentation()
+    }
+
     func refreshPresentation(animated: Bool = true, transitionContent: NotchContentTransition = .none) {
         // A notice with a new reading, or the music strip naming its song,
         // fits its new width in place.
         let fitsInPlace = noticeFitsInPlace && notice != nil && !noticeExpanded
             || musicStripFitsInPlace && compactMusicIsVisible
+            || agentStripFitsInPlace && compactActivity == .agents && notice == nil && !expanded && !peeking
         noticeFitsInPlace = false
         musicStripFitsInPlace = false
+        agentStripFitsInPlace = false
         // SwiftUI reports no exit from a view it removes, so whatever takes
         // the strip's place ends the part under the pointer. A name and a held
         // song stay through a notice or an opening while the pointer does, and
@@ -4260,7 +4272,8 @@ final class NotchService: ObservableObject {
                     self?.objectWillChange.send()
                     // Between waiting and working the strip's mark and reading
                     // both change, and so does its width: cross-fade them while
-                    // the silhouette moves, as one activity replacing another.
+                    // the silhouette eases to its new width without a swing.
+                    self?.agentStripFitsInPlace = true
                     self?.refreshPresentation(transitionContent: .replace)
                 }.store(in: &subscriptions)
         } else {

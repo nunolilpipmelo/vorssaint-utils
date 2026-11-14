@@ -80,7 +80,7 @@ struct NotchAgentStrip: View {
                                 // passing, needs wider wings; the service
                                 // measures the same reading.
                                 .onChange(of: NotchAgentSupport.readingShape(text)) { _, _ in
-                                    DispatchQueue.main.async { service.refreshPresentation() }
+                                    DispatchQueue.main.async { service.fitAgentStrip() }
                                 }
                         }
                     }
